@@ -27,7 +27,8 @@ While 1
 			Case 0x04190419; >> Russian (Russia)
 				Beep(2500, 200)
 			Case 0x04280428; >> Tajik (Cyrillic, Tajikistan)
-				Beep(1500, 200)
+				;Beep(1500, 200)
+				SoundPlay(@ScriptDir & "\tj.wma", 1)
 		EndSwitch
 		;ConsoleWrite("Lang Changed " & $currentLng & '         OR >>'& $sLanguage & @LF); It's for debug if needed
 		$lastLng = $currentLng
