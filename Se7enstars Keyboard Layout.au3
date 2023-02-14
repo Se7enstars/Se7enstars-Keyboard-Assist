@@ -1,3 +1,11 @@
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Icon=Assets\tray.ico
+#AutoIt3Wrapper_UseUpx=y
+#AutoIt3Wrapper_Res_Description=Se7KB Layout
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.3
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_LegalCopyright=© F49C.38F8
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #cs
 	LangDetector by F49C.38F8
 		KB Lang Bin_Codes
