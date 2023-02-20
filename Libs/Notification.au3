@@ -1,18 +1,39 @@
-#include-once
+#include <GDIPlus.au3>
 #include <GUIConstants.au3>
-;_Notification("..\Assets\tjSQR.ico")
-Func _Notification($sIcon, $iTimeOut = 500, $bUPPERCASE = True)
+#include <WinAPI.au3>
+
+_Notification("..\Assets\tj.png")
+
+Func _Notification($hImagePath, $iTimeOut = 500, $iTransparent = 220)
 	$aMouseGetPosition = MouseGetPos()
-	$UI = GUICreate("Notification", 115, 73, @DesktopWidth/2-64, $aMouseGetPosition[1]-40, $WS_POPUP, $WS_EX_TOOLWINDOW+$WS_EX_TOPMOST)
-	GUISetBkColor(0x0, $UI)
-	$hIcon = GUICtrlCreateIcon($sIcon, -1, -6, -28, 128, 128)
-	WinSetTrans($UI, '', 200)
-	GUISetState(@SW_SHOWNOACTIVATE, $UI)
+	$hNTUI = GUICreate('Notification', 100, 100, @DesktopWidth/2-64, $aMouseGetPosition[1]-40, $WS_POPUP, BitOR($WS_EX_LAYERED, $WS_EX_TOOLWINDOW, $WS_EX_TOPMOST))
+	_GDIPlus_Startup()
+	$hImage = _GDIPlus_ImageLoadFromFile($hImagePath)
+	$hBitmap = _GDIPlus_BitmapCreateHBITMAPFromBitmap($hImage)
+	_SetBitmap($hNTUI, $hBitmap, $iTransparent)
+	_GDIPlus_ImageDispose($hImage)
+	GUISetState(@SW_SHOWNOACTIVATE, $hNTUI)
 	$iTimerStart = TimerInit()
 	While 1
 		If TimerDiff($iTimerStart) >= $iTimeOut Then
-			GUIDelete($UI)
+			_WinAPI_DeleteObject($hBitmap)
+			GUIDelete($hNTUI)
 			ExitLoop
 		EndIf
 	WEnd
 EndFunc
+
+Func _SetBitmap($hWnd, $hBitmap, $iOpacity)
+    Local $hDC, $hMemDC, $tBlend, $tSIZE, $tSource
+    $hDC = _WinAPI_GetDC($hWnd)
+    $hMemDC = _WinAPI_CreateCompatibleDC($hDC)
+    _WinAPI_SelectObject($hMemDC, $hBitmap)
+    $tSIZE = _WinAPI_GetBitmapDimension($hBitmap)
+    $tSource = DllStructCreate($tagPOINT)
+    $tBlend = DllStructCreate($tagBLENDFUNCTION)
+    DllStructSetData($tBlend, 'Alpha', $iOpacity)
+    DllStructSetData($tBlend, 'Format', 1)
+    _WinAPI_UpdateLayeredWindow($hWnd, $hDC, 0, DllStructGetPtr($tSIZE), $hMemDC, DllStructGetPtr($tSource), 0, DllStructGetPtr($tBlend), $ULW_ALPHA)
+    _WinAPI_ReleaseDC($hWnd, $hDC)
+    _WinAPI_DeleteDC($hMemDC)
+EndFunc   ;==>_SetBitmap
