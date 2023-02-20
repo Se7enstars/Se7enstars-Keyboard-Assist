@@ -53,7 +53,6 @@ While 1
 					SoundPlay("Assets\TJ.wav")
 					_Notification("Assets\TJ.png")
 			EndSwitch
-			;ConsoleWrite("Lang Changed " & $currentLng & '         OR >>'& $sLanguage & @LF); It's for debug if needed
 			$lastLng = $currentLng
 		EndIf
 	EndIf
