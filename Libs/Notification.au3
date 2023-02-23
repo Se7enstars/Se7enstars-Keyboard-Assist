@@ -2,7 +2,7 @@
 #include <GUIConstants.au3>
 #include <WinAPI.au3>
 
-_Notification("..\Assets\tj.png")
+;_Notification("..\Assets\tj.png")
 
 Func _Notification($hImagePath, $iTimeOut = 500, $iTransparent = 220)
 	$aMouseGetPosition = MouseGetPos()
@@ -17,6 +17,7 @@ Func _Notification($hImagePath, $iTimeOut = 500, $iTransparent = 220)
 	While 1
 		If TimerDiff($iTimerStart) >= $iTimeOut Then
 			_WinAPI_DeleteObject($hBitmap)
+			_GDIPlus_Shutdown()
 			GUIDelete($hNTUI)
 			ExitLoop
 		EndIf

@@ -1,8 +1,8 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=Assets\tray.ico
 #AutoIt3Wrapper_Res_Comment=Developer: F49C.38F8
-#AutoIt3Wrapper_Res_Description=Se7KB Assist
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.9
+#AutoIt3Wrapper_Res_Description=Se7enstars Keyboard Assist
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.22
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_LegalCopyright=© Se7enstars
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -13,7 +13,6 @@
 			0x04190419 >> Russian (Russia)
 			0x04280428 >> Tajik (Cyrillic, Tajikistan)
 #ce
-
 #include <TrayConstants.au3>
 #include <WinAPI.au3>
 #include <WinAPISys.au3>
@@ -22,8 +21,10 @@
 #include <WinAPILocale.au3>
 #include "Libs\Notification.au3"
 
-
 $sAppName = "Se7KB Assist"
+$sAssets = @ScriptDir & '\Assets'
+$sAutorunCMD = "Autorun"
+$iAutoRunSleepTime = 30		; sec
 $iUpdateFrequency = 300		; ms
 $lastLng = ''				; Remember last lang
 $currentLng = ''			; Remember new lang
@@ -31,9 +32,19 @@ $lastCapsLock = BitAND(_WinAPI_GetKeyState($VK_CAPITAL), 1); GetCapsLockStatus
 $newCapsLock = $lastCapsLock
 $bPause = True
 
+If $CmdLine[0] Then
+    If StringInStr($CmdLine[1], "/") = 1 And $CmdLine[0] >= 1 Then
+        If StringInStr($CmdLine[1], $sAutorunCMD) Then
+			TraySetIcon($sAssets & "\Waiting.ico")
+			TraySetToolTip($sAppName & " Waiting...")
+			Sleep($iAutoRunSleepTime*1000); Waiting $iAutoRunSleepTime(sec) on start via /($sAutorunCMD) cmd
+		EndIf
+    EndIf
+EndIf
+
 Opt("TrayMenuMode", 3)
 
-TraySetIcon("Assets\Tray.ico")
+TraySetIcon($sAssets & "\Tray.ico")
 TraySetToolTip($sAppName)
 $tAutorun = TrayCreateItem("Autorun")
 $tPause = TrayCreateItem("Pause")
@@ -49,25 +60,22 @@ While 1
 			$sLanguage = _WinAPI_GetLocaleInfo(_WinAPI_LoWord($currentLng), $LOCALE_SLANGUAGE); Bin_Code to simple string
 			Switch $currentLng
 				Case 0x04090409; >> English (United States)
-					SoundPlay("Assets\EN.wav")
-					_Notification("Assets\EN.png")
+					_LangChangedUI($sAssets & "\EN.wav", $sAssets & "\EN.png", $sAppName & @LF & $sLanguage)
 				Case 0x04190419; >> Russian (Russia)
-					SoundPlay("Assets\RU.wav")
-					_Notification("Assets\RU.png")
+					_LangChangedUI($sAssets & "\RU.wav", $sAssets & "\RU.png", $sAppName & @LF & $sLanguage)
 				Case 0x04280428; >> Tajik (Cyrillic, Tajikistan)
-					SoundPlay("Assets\TJ.wav")
-					_Notification("Assets\TJ.png")
+					_LangChangedUI($sAssets & "\TJ.wav", $sAssets & "\TJ.png", $sAppName & @LF & $sLanguage)
 			EndSwitch
 			$lastLng = $currentLng
 		EndIf
 	EndIf
 	If $newCapsLock <> $lastCapsLock Then
 		If $newCapsLock = 1 Then
-			SoundPlay("Assets\CapsOn.wav")
-			_Notification("Assets\CapsOn.png")
+			SoundPlay($sAssets & "\CapsOn.wav")
+			_Notification($sAssets & "\CapsOn.png")
 		Else
-			SoundPlay("Assets\CapsOff.wav")
-			_Notification("Assets\CapsOff.png")
+			SoundPlay($sAssets & "\CapsOff.wav")
+			_Notification($sAssets & "\CapsOff.png")
 		EndIf
 		$lastCapsLock = $newCapsLock
 	EndIf
@@ -97,6 +105,12 @@ While 1
 	Sleep(10); Reduce CPU
 WEnd
 
+Func _LangChangedUI($sSound, $sIcon, $sTrayTip)
+	SoundPlay($sSound)
+	_Notification($sIcon)
+	TraySetToolTip($sTrayTip)
+EndFunc
+
 Func _OnKeyboardLayoutChange()
 	$currentLng = _WinAPI_GetKeyboardLayout(WinGetHandle('')); Get current KB Lang (Bin_Code)
 	$newCapsLock = BitAND(_WinAPI_GetKeyState($VK_CAPITAL), 1)
@@ -113,7 +127,7 @@ Func _Autorun($sState = "GET")
 				Return True
 			EndIf
 		Case "SET"
-			RegWrite($sKey, $sAppName, "REG_SZ", @ScriptFullPath)
+			RegWrite($sKey, $sAppName, "REG_SZ", @ScriptFullPath & " /" & $sAutorunCMD)
 			Return True
 		Case "DEL"
 			RegDelete($sKey, $sAppName)
