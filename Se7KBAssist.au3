@@ -2,7 +2,7 @@
 #AutoIt3Wrapper_Icon=Assets\tray.ico
 #AutoIt3Wrapper_Res_Comment=Developer: F49C.38F8
 #AutoIt3Wrapper_Res_Description=Se7enstars Keyboard Assist
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.23
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.24
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_LegalCopyright=© Se7enstars
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
@@ -19,6 +19,7 @@
 #include <WinAPIvkeysConstants.au3>
 #include <APILocaleConstants.au3>
 #include <WinAPILocale.au3>
+#include <String.au3>
 #include "Libs\Notification.au3"
 
 $sAppName = "Se7KB Assist"
@@ -42,10 +43,10 @@ If $CmdLine[0] Then
     EndIf
 EndIf
 
-Opt("TrayMenuMode", 3)
-
 TraySetIcon($sAssets & "\Tray.ico")
 TraySetToolTip($sAppName)
+Opt("TrayMenuMode", 3)
+
 $tAutorun = TrayCreateItem("Autorun")
 $tPause = TrayCreateItem("Pause")
 $tAbout = TrayCreateItem("About")
@@ -141,7 +142,7 @@ EndFunc
 Func _AboutUI()
 	Local $iUITimeOut = 5000
 	$taskPOS = WinGetPos("[Class:Shell_TrayWnd]")
-	Local $ui_w = 250, $ui_h = 80
+	Local $ui_w = 260, $ui_h = 80
 	$ui = GUICreate($sAppName, $ui_w, $ui_h, @DesktopWidth-$ui_w, @DesktopHeight-$taskPOS[3]-$ui_h, $WS_POPUP, BitOR($WS_EX_TOOLWINDOW, $WS_EX_TOPMOST))
 	GUISetBkColor(0x0, $ui)
 
@@ -154,9 +155,9 @@ Func _AboutUI()
 	GUICtrlSetFont(-1, 11, 600, Default, 'Microsoft Sans Serif')
 	GUICtrlSetColor(-1, 0x75D00F)
 
-	$sText = "Developer F49C:38F8" & @LF & _
+	$sText = "Developer://F49C.38F8/" & _HexToString("0x4F64696C73686F68") & "/" & @LF & _
 			"GitHub://Se7enstars/" & @LF & _
-			"All Right Reserved!"
+			"All Right Reserved - 2023"
 	GUICtrlCreateLabel($sText, 42, 23, $ui_w-9, 55)
 	GUICtrlSetFont(-1, 9, 600, Default, 'Microsoft Sans Serif')
 	GUICtrlSetColor(-1, 0xFFFFFF)
